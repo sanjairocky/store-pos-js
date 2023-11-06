@@ -1,0 +1,82 @@
+openapi: 3.0.3
+info:
+  title: Rocky Store Api
+  description: |-
+    This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about
+  version: 1.0.0
+servers:
+  - url: /
+tags:
+  - name: product
+    description: Access to store products
+paths:
+  /api/v1/products:
+    get:
+      tags:
+        - product
+      summary: Finds all products
+      description: all products
+      operationId: findPetsByStatus
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: pageSize
+          in: query
+          description: Number of products per page.
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: query
+          in: query
+          description: Search query for filtering products.
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid status value
+      security:
+        # - petstore_auth:
+        #     - write:pets
+        #     - read:pets
+components:
+  schemas:
+    Product:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: doggie
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header

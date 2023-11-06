@@ -1,0 +1,32 @@
+{
+  "name": "store-pos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:api": "prism mock api.yml",
+    "build": "webpack watch",
+    "dev": "webpack-dev-server --mode development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanjairocky/store-pos-js.git"
+  },
+  "author": "SanjaiRocky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sanjairocky/store-pos-js/issues"
+  },
+  "homepage": "https://github.com/sanjairocky/store-pos-js#readme",
+  "devDependencies": {
+    "@stoplight/prism-cli": "^5.5.1",
+    "prism": "^4.1.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}
