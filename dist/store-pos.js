@@ -7,22 +7,19 @@
 class PointOfSale {
   constructor(options) {
     this.baseUrl = options.baseUrl || "";
-    this.currentPage = 1;
-    this.pageSize = 10; // Default page size
+    this.page = options.page || 1;
+    this.pageSize = options.pageSize || 10;
   }
 
   async getProducts(options = {}) {
-    const {
-      page = this.currentPage,
-      pageSize = this.pageSize,
-      query = "",
-    } = options;
+    const { page = this.page, pageSize = this.pageSize, query = "" } = options;
     const fetchProductsFromAPI = async (page, pageSize, query = "") => {
       try {
-        const url = `${this.baseUrl}/products?page=${page}&pageSize=${pageSize}&query=${query}`;
+        const url = `${this.baseUrl}/api/products?page=${page}&pageSize=${pageSize}&query=${query}`;
         const response = await fetch(url, {
           headers: {
             Authorization: `bearer ${localStorage.getItem("access-token")}`,
+            "X-API-Key": localStorage.getItem("access-token"),
           },
         });
         if (response.ok) {
@@ -39,8 +36,15 @@ class PointOfSale {
     };
     return fetchProductsFromAPI(page, pageSize, query).then((data) => ({
       ...data,
+      currentPage: page,
+      prev:
+        page - 1 > 0
+          ? () => {
+              return this.getProducts({ page: page - 1, pageSize, query });
+            }
+          : undefined,
       next: () => {
-        return fetchProductsFromAPI(page + 1, pageSize, query);
+        return this.getProducts({ page: page + 1, pageSize, query });
       },
     }));
   }
