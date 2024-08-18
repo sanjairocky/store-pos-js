@@ -11,10 +11,8 @@ tags:
   description: Access to products
 - name: stores
   description: Access to store products
-- name: cart
-  description: Access to cart
-- name: bills
-  description: Access to bills
+- name: orders
+  description: Access to Orders
 paths:
   /products:
     get:
@@ -128,78 +126,13 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: "#/components/schemas/Store"
-                - $ref: "#/components/schemas/Id"
-        "400":
-          description: Invalid product value
-        "500":
-          description: Internal server error
-  /stores/{storeId}/bills:
-    get:
-      tags:
-      - bills
-      summary: get all store bills
-      description: get bills of the store
-      operationId: GetAllStoreBills
-      parameters:
-      - name: storeId
-        in: path
-        description: Store Id
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "201":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  allOf:
-                  - $ref: "#/components/schemas/Bill"
+                  - $ref: "#/components/schemas/Store"
                   - $ref: "#/components/schemas/Id"
         "400":
           description: Invalid product value
         "500":
           description: Internal server error
-  /stores/{storeId}/bills/{billId}:
-    get:
-      tags:
-      - bills
-      summary: get store bill by id
-      description: get bill of the store by id
-      operationId: GetStoreBillById
-      parameters:
-      - name: storeId
-        in: path
-        description: Store Id
-        required: true
-        schema:
-          type: integer
-          format: int64
-      - name: billId
-        in: path
-        description: Bill Id
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "201":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                allOf:
-                - $ref: "#/components/schemas/Bill"
-                - $ref: "#/components/schemas/Id"
-        "400":
-          description: Invalid product value
-        "500":
-          description: Internal server error
-  /stores/{storeId}/products:
+  /stores/{storeId}/inventory:
     get:
       tags:
       - stores
@@ -264,16 +197,162 @@ paths:
           description: Invalid product value
         "500":
           description: Internal server error
-  /cart/products/{productId}:
+  /orders:
+    get:
+      tags:
+      - orders
+      summary: search orders
+      description: orders search
+      operationId: searchOrders
+      parameters:
+      - name: storeId
+        in: query
+        description: Store Id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: orderType
+        in: query
+        description: Order Type
+        required: true
+        schema:
+          type: string
+          example: Purchase
+      responses:
+        "201":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                  - $ref: "#/components/schemas/Order"
+                  - $ref: "#/components/schemas/Id"
+        "400":
+          description: Invalid product value
+        "500":
+          description: Internal server error
+  /stores/{storeId}/orders:
+    post:
+      tags:
+      - orders
+      summary: create order
+      description: checkout order
+      parameters:
+      - name: storeId
+        in: path
+        description: Store Id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "201":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Id"
+        "400":
+          description: Invalid status value
+        "500":
+          description: Internal server error
+  /stores/{storeId}/orders/{orderId}:
+    get:
+      tags:
+      - orders
+      summary: get store order by id
+      description: get Order of the store by id
+      operationId: GetStoreOrderById
+      parameters:
+      - name: storeId
+        in: path
+        description: Store Id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: orderId
+        in: path
+        description: Order Id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "201":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Order"
+                  - $ref: "#/components/schemas/Id"
+        "400":
+          description: Invalid product value
+        "500":
+          description: Internal server error
+    post:
+      tags:
+      - orders
+      summary: checkout store order
+      description: checkout Order of the store
+      operationId: CheckoutStoreOrder
+      parameters:
+      - name: storeId
+        in: path
+        description: Store Id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: orderId
+        in: path
+        description: Order Id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "201":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Order"
+                  - $ref: "#/components/schemas/Id"
+        "400":
+          description: Invalid product value
+        "500":
+          description: Internal server error
+  /stores/{storeId}/orders/{orderId}/products/{productId}:
     put:
       tags:
-      - cart
-      summary: Add product to cart
-      description: add a product to cart
+      - orders
+      summary: Add product to an order
+      description: add a product to an order
       parameters:
       - name: productId
         in: path
         description: Product Id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: storeId
+        in: path
+        description: Store Id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: orderId
+        in: path
+        description: Order Id
         required: true
         schema:
           type: integer
@@ -289,13 +368,27 @@ paths:
           description: Internal server error
     delete:
       tags:
-      - cart
-      summary: delete product to cart
-      description: delete a product to cart
+      - orders
+      summary: delete product from an order
+      description: delete a product from an order
       parameters:
       - name: productId
         in: path
         description: Product Id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: storeId
+        in: path
+        description: Store Id
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: orderId
+        in: path
+        description: Order Id
         required: true
         schema:
           type: integer
@@ -305,37 +398,6 @@ paths:
           description: successful operation
         "204":
           description: not found
-        "400":
-          description: Invalid status value
-        "500":
-          description: Internal server error
-  /cart:
-    post:
-      tags:
-      - cart
-      summary: Checkout cart
-      description: checkout cart
-      responses:
-        "200":
-          description: successful operation
-        "400":
-          description: Invalid status value
-        "500":
-          description: Internal server error
-    get:
-      tags:
-      - cart
-      summary: get all cart items
-      description: get all cart items
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Product"
         "400":
           description: Invalid status value
         "500":
@@ -418,7 +480,7 @@ components:
         description:
           type: string
           example: doggie store description
-    Bill:
+    Order:
       type: object
       properties:
         total:
